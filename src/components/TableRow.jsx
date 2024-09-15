@@ -25,7 +25,7 @@ import { ProjectPreview } from "./ProjectPreview";
 import { apiClient } from "../apiClient";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-export const TableRow = ({ id, items ,projs}) => {
+export const TableRow = ({ id, items, projs }) => {
   const queryClient = useQueryClient();
   const { setNodeRef } = useDroppable({
     id,
@@ -88,6 +88,8 @@ export const TableRow = ({ id, items ,projs}) => {
             name: projectName,
             users: null,
             state: 1,
+            summary,
+            transcript,
             id:
               oldData
                 .map((item) => item.id)
@@ -169,7 +171,7 @@ export const TableRow = ({ id, items ,projs}) => {
                         onChange={(e) => setTechSpecialist(e.target.value)}
                         placeholder="Select Tech Specialist"
                       >
-                        {data?.map((tech) => (
+                        {data?.$values?.map((tech) => (
                           <option value={tech?.id}>{tech?.email}</option>
                         ))}
                       </Select>

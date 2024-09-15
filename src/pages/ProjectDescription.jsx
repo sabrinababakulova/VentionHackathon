@@ -7,7 +7,7 @@ import {
   Input,
   Textarea,
   Center,
-  Spinner
+  Spinner,
 } from "@chakra-ui/react";
 
 import { useQuery } from "@tanstack/react-query";
@@ -30,7 +30,7 @@ const ProjectDescription = () => {
     staleTime: Infinity,
   });
 
-  if (isLoading) {
+  if (isLoading || !data) {
     return (
       <Center>
         <Spinner />
@@ -44,16 +44,24 @@ const ProjectDescription = () => {
         <Flex w="100%" gap="5">
           <FormControl>
             <FormLabel mb={0}>Project Name</FormLabel>
-            <Input placeholder="Project Name" />
+            <Input placeholder="Project Name" value={data?.name} readOnly />
           </FormControl>
           <FormControl>
-            <FormLabel mb={0}>Project Name</FormLabel>
-            <Input placeholder="Client's Name" />
+            <FormLabel mb={0}>Client's Name</FormLabel>
+            <Input
+              placeholder="Client's Name"
+              value={data?.clientName}
+              readOnly
+            />
           </FormControl>
         </Flex>
         <FormControl>
           <FormLabel mb={0}>Description</FormLabel>
-          <Textarea placeholder="Description" />
+          <Textarea
+            placeholder="Description"
+            value={data?.description}
+            readOnly
+          />
         </FormControl>
         <Flex w="100%" gap="5">
           <FormControl>
@@ -64,15 +72,22 @@ const ProjectDescription = () => {
               value="sabrina.babakulova@ventionteams.com"
             />
           </FormControl>
-          <FormControl>
-            <FormLabel mb={0}>Sales Manager</FormLabel>
-            <Input placeholder="Tech Specialist" />
-          </FormControl>
         </Flex>
         <FormControl>
           <FormLabel mb={0}>Term of a project</FormLabel>
           <Flex gap={2} w="300px">
-            <Input placeholder="Number" />
+            <Input
+              placeholder="Number"
+              value={data?.monthsNeeded + " months"}
+            />
+          </Flex>
+        </FormControl>
+        <FormControl>
+          <FormLabel mb={0}>Users</FormLabel>
+          <Flex gap={2} w="300px">
+            {data?.members?.$values?.map((user) => (
+              <Input placeholder="User" value={user?.fullName} readOnly />
+            ))}
           </Flex>
         </FormControl>
       </VStack>

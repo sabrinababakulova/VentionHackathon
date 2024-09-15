@@ -8,6 +8,7 @@ import ProjectDescription from "./ProjectDescription";
 import Ideas from "./Ideas";
 import ProjectLayout from "./ProjectLayout";
 import SignIn from "./SignIn";
+import Docs from "./Docs";
 
 export const router = () =>
   createBrowserRouter([
@@ -41,7 +42,11 @@ export const router = () =>
             },
             {
               path: "/projects/:id/docs",
-              element: <ProjectDescription />,
+              element: <Docs />,
+            },
+            {
+              path: "/projects/:id/pdw",
+              element: <Docs />,
             },
           ],
         },

@@ -20,6 +20,7 @@ export const ModalWindow = ({
   type = "home",
   modalSize,
   isLoading,
+  disabled,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
@@ -39,7 +40,7 @@ export const ModalWindow = ({
           <IoMdAddCircle color="#C7CED9" size={50} />
         </Flex>
       ) : (
-        <Button onClick={onOpen} colorScheme="orange" bg="#FF6A47" mr={4} h={8}>
+        <Button isDisabled={false}  onClick={onOpen} colorScheme="orange" bg="#FF6A47" mr={4} h={8}>
           Client Approve
         </Button>
       )}

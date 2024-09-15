@@ -70,10 +70,12 @@ const Home = () => {
 
   useEffect(() => {
     if (data && !isLoading) {
-      const negotiationPhase = data?.filter((item) => item.state === 1);
-      const ideasGeneration = data?.filter((item) => item.state === 2);
-      const pdwPhase = data?.filter((item) => item.state === 3);
-      const inDevelopment = data?.filter((item) => item.state === 4);
+      const negotiationPhase = data?.$values?.filter(
+        (item) => item.state === 1,
+      );
+      const ideasGeneration = data?.$values?.filter((item) => item.state === 2);
+      const pdwPhase = data?.$values?.filter((item) => item.state === 3);
+      const inDevelopment = data?.$values?.filter((item) => item.state === 4);
       setItems({
         "Negotiation Phase": negotiationPhase.map((item) => item.id),
         "Ideas Generation": ideasGeneration.map((item) => item.id),
@@ -264,11 +266,11 @@ const Home = () => {
                   </Text>
                 </Flex>
               </Flex>
-              <TableRow id={item} items={items?.[item]} projs={data} />
+              <TableRow id={item} items={items?.[item]} projs={data?.$values} />
             </Box>
           ))}
           <DragOverlay>
-            {activeId ? <ProjectPreview projs={data} item={activeId} /> : null}
+            {activeId ? <ProjectPreview projs={data?.$values} item={activeId} /> : null}
           </DragOverlay>
         </DndContext>
       </Flex>

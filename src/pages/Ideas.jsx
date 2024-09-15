@@ -7,6 +7,7 @@ import {
   AccordionPanel,
   AccordionIcon,
   Box,
+  Badge,
   Heading,
   Button,
   Flex,
@@ -21,13 +22,14 @@ import {
 } from "@chakra-ui/react";
 import { ModalWindow } from "../components/Modal";
 import { useParams } from "react-router-dom";
-import { apiClient } from "../apiClient";
+import { apiClient, apiClientBlob } from "../apiClient";
 import { useQuery } from "@tanstack/react-query";
 
 const Ideas = () => {
   const { id } = useParams();
-  const [state, setState] = React.useState("Pending");
   const [error, setError] = React.useState("");
+  const [ideaLoading, setIdeaLoading] = React.useState(false);
+  const [pdw, setPdw] = React.useState(false);
 
   const getProjIdeas = async () => {
     try {
@@ -43,11 +45,29 @@ const Ideas = () => {
     staleTime: Infinity,
   });
 
-  const handleClientApprove = async () => {
+  const handleClientApprove = async (ideaId) => {
     try {
-      await apiClient.put(`/api/idea/client-approve/${id}`);
-      navigate("/");
+      setIdeaLoading(true);
+      const data = await apiClientBlob.put(
+        `/api/idea/client-approve/${ideaId}`,
+      );
+
+      const url = window.URL.createObjectURL(
+        new Blob([data?.data], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        }),
+      );
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "PDW_Report.xlsx"); // the file name
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      setPdw(true);
+      setIdeaLoading(false);
     } catch (er) {
+      setIdeaLoading(false);
       setError("Something went wrong");
     }
   };
@@ -62,7 +82,17 @@ const Ideas = () => {
     }
   };
 
-  if (isLoading) {
+  if (pdw) {
+    return (
+      <Center>
+        <Badge p={2} colorScheme="green">
+          PDW Downloaded
+        </Badge>
+      </Center>
+    );
+  }
+
+  if (isLoading || !data) {
     return (
       <Center>
         <Spinner />
@@ -90,139 +120,71 @@ const Ideas = () => {
         </Flex>
       </Flex>
       <Accordion defaultIndex={[0]} allowMultiple>
-        <AccordionItem
-          rounded="xl"
-          border="1px solid"
-          borderColor="gray.300"
-          mt={4}
-        >
-          <h2>
-            <AccordionButton>
-              <Box as="span" flex="1" textAlign="left">
-                Section 1 title
-              </Box>
-              <Select
-                bg={
-                  state === "Pending"
-                    ? "#FAEF5199"
-                    : state === "Approved"
-                      ? "#A3DE8FB2"
-                      : "#E55555B2"
-                }
-                w="150px"
-                mr={4}
-                h={8}
-                onChange={(e) => setState(e.target.value)}
-                defaultValue={state}
+        {data?.$values.map((idea) => (
+          <AccordionItem
+            key={idea?.id}
+            rounded="xl"
+            border="1px solid"
+            borderColor="gray.300"
+            mt={4}
+          >
+            <h2>
+              <AccordionButton>
+                <Box as="span" flex="1" textAlign="left">
+                  {idea?.name}
+                </Box>
+                <Select w="150px" mr={4} h={8}>
+                  <option value="Pending">Pending</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Rejected">Rejected</option>
+                </Select>
+                <ModalWindow
+                  disabled={!idea?.techLeadApproved}
+                  type="ideas"
+                  title="Accept Idea"
+                  onAccept={() => handleClientApprove(idea?.id)}
+                  acceptText="Accept"
+                  modalSize="xl"
+                  isLoading={ideaLoading}
+                >
+                  {ideaLoading ? (
+                    <Center h={40}>
+                      <Spinner />
+                    </Center>
+                  ) : (
+                    <VStack gap={3} key="asdfasdf">
+                      <Heading fontSize="xl" color="#FF6A47">
+                        Are you sure you want to accept this idea?
+                      </Heading>
+                      <Text>
+                        You will be redirected to PDW phase of the negotiation
+                        process
+                      </Text>
+                    </VStack>
+                  )}
+                </ModalWindow>
+                <AccordionIcon />
+              </AccordionButton>
+            </h2>
+            <AccordionPanel pb={4}>
+              <Text>{idea?.description}</Text>
+              <br />
+              <hr />
+              <br />
+              {idea?.requirementQuestions?.split(",")?.map((req) => (
+                <Text p={2}>{req}</Text>
+              ))}
+              <Checkbox
+                isReadOnly={localStorage.getItem("role") !== "TechLead"}
+                onChange={(e) => handleTechleadApprove(e.target.checked)}
+                value={idea?.techLeadApproved}
+                colorScheme="orange"
               >
-                <option value="Pending">Pending</option>
-                <option value="Approved">Approved</option>
-                <option value="Rejected">Rejected</option>
-              </Select>
-              <ModalWindow
-                type="ideas"
-                title="Accept Idea"
-                onAccept={handleClientApprove}
-                acceptText="Accept"
-                modalSize="xl"
-              >
-                <VStack gap={3} key="asdfasdf">
-                  <Heading fontSize="xl" color="#FF6A47">
-                    Are you sure you want to accept this idea?
-                  </Heading>
-                  <Text>
-                    You will be redirected to PDW phase of the negotiation
-                    process
-                  </Text>
-                </VStack>
-              </ModalWindow>
-              <AccordionIcon />
-            </AccordionButton>
-          </h2>
-          <AccordionPanel pb={4}>
-            <Text>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit
-              amet, consectetur adipiscing elit, sed do Lorem ipsum dolor sit
-              amet, consectetur adipiscing elit, sed do eiusmod tempor
-              incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-              veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-              ex ea commodo consequat. eiusmod tempor incididunt ut labore et
-              dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-              exercitation ullamco laboris nisi ut aliquip ex ea commodo
-              consequat. Lorem ipsum dolor sit amet, consectetur adipiscing
-              elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-              aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-              laboris nisi ut aliquip ex Lorem ipsum dolor sit amet, consectetur
-              adipiscing elit, sed do Lorem ipsum dolor sit amet, consectetur
-              adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-              dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-              exercitation ullamco laboris nisi ut aliquip ex ea commodo
-              consequat. eiusmod tempor incididunt ut labore et dolore magna
-              aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-              laboris nisi ut aliquip ex ea commodo consequat. ea commodo
-              consequat.
-            </Text>
-            <Checkbox
-              isReadOnly={localStorage.getItem("role") !== "TechLead"}
-              onChange={(e) => handleTechleadApprove(e.target.checked)}
-              colorScheme="orange"
-            >
-              Techlead Approval
-            </Checkbox>
-          </AccordionPanel>
-        </AccordionItem>
-
-        <AccordionItem
-          rounded="xl"
-          border="1px solid"
-          borderColor="gray.300"
-          mt={4}
-        >
-          <h2>
-            <AccordionButton>
-              <Box as="span" flex="1" textAlign="left">
-                Section 2 title
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-          </h2>
-          <AccordionPanel pb={4}>
-            <Text>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat. Lorem ipsum dolor sit
-              amet, consectetur adipiscing elit, sed do Lorem ipsum dolor sit
-              amet, consectetur adipiscing elit, sed do eiusmod tempor
-              incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-              veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-              ex ea commodo consequat. eiusmod tempor incididunt ut labore et
-              dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-              exercitation ullamco laboris nisi ut aliquip ex ea commodo
-              consequat. Lorem ipsum dolor sit amet, consectetur adipiscing
-              elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-              aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-              laboris nisi ut aliquip ex Lorem ipsum dolor sit amet, consectetur
-              adipiscing elit, sed do Lorem ipsum dolor sit amet, consectetur
-              adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-              dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-              exercitation ullamco laboris nisi ut aliquip ex ea commodo
-              consequat. eiusmod tempor incididunt ut labore et dolore magna
-              aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-              laboris nisi ut aliquip ex ea commodo consequat. ea commodo
-              consequat.
-            </Text>
-            <Checkbox
-              onChange={(e) => (e.target.checked ? handleTechleadApprove : {})}
-              colorScheme="orange"
-            >
-              Techlead Approval
-            </Checkbox>
-          </AccordionPanel>
-        </AccordionItem>
+                Techlead Approval
+              </Checkbox>
+            </AccordionPanel>
+          </AccordionItem>
+        ))}
       </Accordion>
       <Flex mt={4} w="100%" justifyContent="center">
         <Button bg="#FF6A47" colorScheme="orange">

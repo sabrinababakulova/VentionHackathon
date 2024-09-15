@@ -44,9 +44,8 @@ const Sidebar = () => {
 const SidebarContent = ({ onClose, ...rest }) => {
   const { id } = useParams();
   const linkItems = [
-    { name: "Info", icon: BsChat, href: `/projects/${id}` },
-    { name: "Ideas", icon: BsChat, href: `/projects/${id}/ideas` },
-    { name: "Docs", icon: BsChat, href: `/projects/${id}/docs` },
+    { name: "Info", href: `/projects/${id}` },
+    { name: "Ideas", href: `/projects/${id}/ideas` },
   ];
 
   return (

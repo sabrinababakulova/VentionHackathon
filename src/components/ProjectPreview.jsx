@@ -35,9 +35,9 @@ export const ProjectPreview = ({ item, projs }) => {
     <Text>{correctProject?.monthsNeeded} months</Text>
       <Flex w="100%" justifyContent="space-between" gap={2}>
         <AvatarGroup size="xs" max={2}>
-          {correctProject?.users &&
-            correctProject?.users.map((user) => (
-              <Avatar name="Ryan Florence" src="https://bit.ly/ryan-florence" />
+          {correctProject?.members &&
+            correctProject?.members?.$values.map((user) => (
+              <Avatar name={user?.fullName} bg="red"/>
             ))}
         </AvatarGroup>
         <Flex gap={2}>
