@@ -34,6 +34,7 @@ const SignIn = () => {
       const { data } = await apiClient.post("/sign-in", formData);
       localStorage.setItem("email", email);
       localStorage.setItem("accessToken", data?.result?.accessToken);
+      localStorage.setItem('role', data?.result?.role);
       navigate("/"); // Redirect to home page
     } catch (er) {
       setError("Invalid email or password");
