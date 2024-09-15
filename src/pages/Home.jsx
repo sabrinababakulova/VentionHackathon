@@ -14,6 +14,7 @@ import { ProjectPreview } from "../components/ProjectPreview";
 import { TableRow } from "../components/TableRow";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "../apiClient";
+import { useEffect } from "react";
 
 const Home = () => {
   const getProjects = async () => {
@@ -51,6 +52,36 @@ const Home = () => {
     "PDW Phase",
     "In Development",
   ];
+
+  const getState = (state) => {
+    switch (state) {
+      case "Negotiation Phase":
+        return 1;
+      case "Ideas Generation":
+        return 2;
+      case "PDW Phase":
+        return 3;
+      case "In Development":
+        return 4;
+      default:
+        return 1;
+    }
+  };
+
+  useEffect(() => {
+    if (data && !isLoading) {
+      const negotiationPhase = data?.filter((item) => item.state === 1);
+      const ideasGeneration = data?.filter((item) => item.state === 2);
+      const pdwPhase = data?.filter((item) => item.state === 3);
+      const inDevelopment = data?.filter((item) => item.state === 4);
+      setItems({
+        "Negotiation Phase": negotiationPhase.map((item) => item.id),
+        "Ideas Generation": ideasGeneration.map((item) => item.id),
+        "PDW Phase": pdwPhase.map((item) => item.id),
+        "In Development": inDevelopment.map((item) => item.id),
+      });
+    }
+  }, [data, isLoading]);
 
   function findContainer(id) {
     if (id in items) {
@@ -119,7 +150,7 @@ const Home = () => {
     });
   }
 
-  function handleDragEnd(event) {
+  async function handleDragEnd(event) {
     const { active, over } = event;
     const { id } = active;
     const { id: overId } = over;
@@ -149,6 +180,9 @@ const Home = () => {
       }));
     }
 
+    await apiClient.put(
+      `/api/project/change-state?projectId=${id}&state=${getState(overContainer)}`,
+    );
     setActiveId(null);
   }
   const getNumberScheme = (index) => {
@@ -180,7 +214,7 @@ const Home = () => {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || !data) {
     return (
       <Center>
         <Spinner />
@@ -226,15 +260,15 @@ const Home = () => {
                     fontSize="xs"
                     fontWeight="bold"
                   >
-                    2
+                    {items?.[item]?.length}
                   </Text>
                 </Flex>
               </Flex>
-              <TableRow id={item} items={items?.[item]} />
+              <TableRow id={item} items={items?.[item]} projs={data} />
             </Box>
           ))}
           <DragOverlay>
-            {activeId ? <ProjectPreview id={activeId} /> : null}
+            {activeId ? <ProjectPreview projs={data} item={activeId} /> : null}
           </DragOverlay>
         </DndContext>
       </Flex>

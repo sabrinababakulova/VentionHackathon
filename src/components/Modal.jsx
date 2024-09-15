@@ -19,6 +19,7 @@ export const ModalWindow = ({
   acceptText,
   type = "home",
   modalSize,
+  isLoading,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
@@ -45,24 +46,28 @@ export const ModalWindow = ({
 
       <Modal size={modalSize || "xl"} isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent minW={!modalSize ? ['200px',"1000px"] : "auto"}>
+        <ModalContent minW={!modalSize ? ["200px", "1000px"] : "auto"}>
           <ModalHeader color="#FF6A47">{title}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>{children}</ModalBody>
-
-          <ModalFooter>
-            <Button variant="outline" mr={3} onClick={onClose}>
-              Close
-            </Button>
-            <Button
-              bg="#FF6A47"
-              colorScheme="orange"
-              color="white"
-              onClick={onAccept}
-            >
-              {acceptText}
-            </Button>
-          </ModalFooter>
+          {!isLoading && (
+            <ModalFooter>
+              <Button variant="outline" mr={3} onClick={onClose}>
+                Close
+              </Button>
+              <Button
+                bg="#FF6A47"
+                colorScheme="orange"
+                color="white"
+                onClick={async () => {
+                  await onAccept();
+                  onClose();
+                }}
+              >
+                {acceptText}
+              </Button>
+            </ModalFooter>
+          )}
         </ModalContent>
       </Modal>
     </>
