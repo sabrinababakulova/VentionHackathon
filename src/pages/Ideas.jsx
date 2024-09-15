@@ -183,7 +183,8 @@ const Ideas = () => {
               <Checkbox
                 isReadOnly={localStorage.getItem("role") !== "TechLead"}
                 onChange={(e) => handleTechleadApprove(e.target.checked)}
-                value={idea?.techLeadApproved}
+                defaultChecked={idea?.techLeadApproved}
+              
                 colorScheme="orange"
               >
                 Techlead Approval
