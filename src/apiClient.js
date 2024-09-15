@@ -30,7 +30,7 @@ export const apiClientBlob = axios.create({
   headers: {
     "Content-Type": "blob",
     Accept: "*/*",
-    "response-type": "arraybuffer",
+    "Response-Type": "arraybuffer",
   },
 });
 apiClientBlob.interceptors.request.use(

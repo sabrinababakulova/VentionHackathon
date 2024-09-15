@@ -24,6 +24,7 @@ import { ModalWindow } from "../components/Modal";
 import { useParams } from "react-router-dom";
 import { apiClient, apiClientBlob } from "../apiClient";
 import { useQuery } from "@tanstack/react-query";
+import * as XLSX from "xlsx";
 
 const Ideas = () => {
   const { id } = useParams();
@@ -52,21 +53,27 @@ const Ideas = () => {
         `/api/idea/client-approve/${ideaId}`,
       );
 
-      const url = window.URL.createObjectURL(
-        new Blob([data?.data], {
-          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        }),
-      );
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", "PDW_Report.xlsx"); // the file name
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
 
+      // Create a Blob from the binary array (this assumes the backend provides valid XLSX binary data)
+      const blob = new Blob([data?.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      // Create a link element, set the download attribute, and trigger the download
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "file.xlsx"; // Set the filename for the download
+      document.body.appendChild(a);
+      a.click();
+
+      // Clean up the DOM after the download is triggered
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
       setPdw(true);
       setIdeaLoading(false);
     } catch (er) {
+      console.log(er);
       setIdeaLoading(false);
       setError("Something went wrong");
     }
