@@ -145,7 +145,7 @@ export const TableRow = ({ id, items }) => {
               </Flex>
               <FormControl>
                 <FormLabel mb={0}>Term of a project</FormLabel>
-                <Flex gap={2} w="300px">
+                <Flex gap={2} w="350px">
                   <Input
                     type="number"
                     placeholder="Enter a number"
@@ -164,7 +164,7 @@ export const TableRow = ({ id, items }) => {
                   {file?.name}
                 </Badge>
               ))}
-              <Flex w="100%" gap={4}>
+              <Flex w="100%" gap={4} flexDir={["column", "row"]}>
                 <FileInput
                   setUploadedFile={setSummary}
                   restrictions={[".txt"]}

@@ -45,7 +45,7 @@ export const ModalWindow = ({
 
       <Modal size={modalSize || "xl"} isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent minW={!modalSize ? "1000px" : "auto"}>
+        <ModalContent minW={!modalSize ? ['200px',"1000px"] : "auto"}>
           <ModalHeader color="#FF6A47">{title}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>{children}</ModalBody>

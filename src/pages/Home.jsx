@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {Center, Spinner, Text, Box, Flex, Heading } from "@chakra-ui/react";
+import { Center, Spinner, Text, Box, Flex, Heading } from "@chakra-ui/react";
 import {
   DndContext,
   DragOverlay,
@@ -29,21 +29,6 @@ const Home = () => {
     queryFn: getProjects,
     staleTime: Infinity,
   });
-  const getPProjects = async () => {
-    try {
-      const { data } = await apiClient.get("/techleads");
-      return data;
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  const { data:tech } = useQuery({
-    queryKey: ["tech"],
-    queryFn: getPProjects,
-    staleTime: Infinity,
-  });
-
-  console.log(tech);
 
   const [items, setItems] = useState({
     "Negotiation Phase": ["1", "2", "3"],
@@ -197,15 +182,17 @@ const Home = () => {
 
   if (isLoading) {
     return (
-      <Center><Spinner/></Center>
+      <Center>
+        <Spinner />
+      </Center>
     );
   }
   return (
-    <Box p={12} px={16} w="100%">
+    <Box p={12} px={[4, 16]} w="100%">
       <Heading color="#FF6A47" mb={10}>
         Projects Board
       </Heading>
-      <Flex h="100vh" gap={4} w="100%">
+      <Flex h="100vh" gap={4} w="100%" flexWrap={["wrap", "nowrap"]}>
         <DndContext
           sensors={sensors}
           collisionDetection={closestCorners}

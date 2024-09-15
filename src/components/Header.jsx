@@ -25,17 +25,23 @@ export const Header = () => {
   };
 
   return (
-    <Flex bg="#FF6A47" p={5} justifyContent="space-between" w="100%" h="80px">
+    <Flex
+      bg="#FF6A47"
+      p={[0, 5]}
+      justifyContent="space-between"
+      w="100%"
+      h="80px"
+    >
       <Flex onClick={() => navigate("/")} cursor="pointer">
         <Box position="absolute" top="16px">
           <Image width={24} height={20} src={Logo} />
         </Box>
-        <Heading ml={16} color="white">
+        <Heading ml={16} color="white" display={["none", "block"]}>
           Sally
         </Heading>
       </Flex>
-      <Flex gap={3}>
-        <Heading textTransform="capitalize">
+      <Flex gap={3} ml={[14, 0]}>
+        <Heading textTransform="capitalize" fontSize={["20px", "2xl"]}>
           {email},
           <span style={{ color: "white" }}> welcome to our system!</span>
         </Heading>
@@ -44,7 +50,6 @@ export const Header = () => {
             <Avatar name="Makhmood" src={AI} />
           </MenuButton>
           <MenuList>
-            <MenuItem>HowTo</MenuItem>
             <MenuItem onClick={handleLogOut}>Log Out</MenuItem>
           </MenuList>
         </Menu>
