@@ -24,7 +24,6 @@ import { ModalWindow } from "../components/Modal";
 import { useParams } from "react-router-dom";
 import { apiClient, apiClientBlob } from "../apiClient";
 import { useQuery } from "@tanstack/react-query";
-import * as XLSX from "xlsx";
 
 const Ideas = () => {
   const { id } = useParams();
