@@ -166,7 +166,7 @@ const Ideas = () => {
               consequat.
             </Text>
             <Checkbox
-              isReadOnly={localStorage.getItem("role") !== "techlead"}
+              isReadOnly={localStorage.getItem("role") !== "TechLead"}
               onChange={(e) => handleTechleadApprove(e.target.checked)}
               colorScheme="orange"
             >
