@@ -11,7 +11,7 @@ import {
   MenuItem,
 } from "@chakra-ui/react";
 import Logo from "../assets/logo.png";
-import AI from "../assets/ai.png";
+import AI from "../assets/AI.png";
 import { useNavigate } from "react-router-dom";
 
 export const Header = () => {
