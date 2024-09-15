@@ -6,6 +6,7 @@ import {
   AlertDescription,
   VStack,
   Center,
+  Text,
   Spinner,
   FormControl,
   FormLabel,
@@ -79,24 +80,13 @@ export const TableRow = ({ id, items, projs }) => {
       formData.append("Transcript", transcript);
 
       setLoading(true);
-      await apiClient.post("/projects", formData);
+      const data = await apiClient.post("/projects", formData);
       setLoading(false);
       queryClient.setQueryData(["projects"], (oldData) => {
-        return [
+        return {
           ...oldData,
-          {
-            name: projectName,
-            users: null,
-            state: 1,
-            summary,
-            transcript,
-            id:
-              oldData
-                .map((item) => item.id)
-                .sort((a, b) => a - b)
-                .pop() + 1,
-          },
-        ];
+          $values: [...oldData.$values, data],
+        };
       });
     } catch (error) {
       setLoading(false);
@@ -125,6 +115,7 @@ export const TableRow = ({ id, items, projs }) => {
           >
             {loading ? (
               <Center h={40}>
+                <Text>Processing...</Text>
                 <Spinner />
               </Center>
             ) : (

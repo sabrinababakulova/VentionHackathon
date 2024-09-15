@@ -53,7 +53,6 @@ const Ideas = () => {
         `/api/idea/client-approve/${ideaId}`,
       );
 
-
       // Create a Blob from the binary array (this assumes the backend provides valid XLSX binary data)
       const blob = new Blob([data?.data], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -156,6 +155,7 @@ const Ideas = () => {
                 >
                   {ideaLoading ? (
                     <Center h={40}>
+                      <Text>Processing...</Text>
                       <Spinner />
                     </Center>
                   ) : (
