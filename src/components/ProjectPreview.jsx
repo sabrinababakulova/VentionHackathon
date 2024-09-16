@@ -32,7 +32,7 @@ export const ProjectPreview = ({ item, projs }) => {
   const downloadPDW = async () => {
     try {
       setLoading(true);
-      await fetch(`/api/pdw/download-roadmap/${correctProject?.pdwId}`, {
+      await fetch(`${baseURL}/api/pdw/download-roadmap/${correctProject?.pdwId}`, {
         method: "GET",
       })
         .then((response) => response.blob())
