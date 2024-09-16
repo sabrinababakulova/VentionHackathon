@@ -48,7 +48,7 @@ export const ProjectPreview = ({ item, projs }) => {
         })
         .catch((error) => console.error("Error:", error));
     } catch (er) {
-      setError("Something went wrong");
+      console.log(er);
     }
     setLoading(false);
   };
