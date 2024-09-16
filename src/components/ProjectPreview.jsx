@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { MdMessage } from "react-icons/md";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { apiClient } from "../apiClient";
+import {baseURL } from "../apiClient";
 import { useState } from "react";
 import { ModalWindow } from "./Modal";
 
