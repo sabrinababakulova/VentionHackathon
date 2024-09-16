@@ -1,12 +1,25 @@
 import React from "react";
-import { Flex, Heading, AvatarGroup, Avatar, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Heading,
+  AvatarGroup,
+  Avatar,
+  Text,
+  Center,
+  Spinner,
+} from "@chakra-ui/react";
 import { RiAttachmentFill } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import { MdMessage } from "react-icons/md";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { apiClient } from "../apiClient";
+import { useState } from "react";
+import { ModalWindow } from "./Modal";
 
 export const ProjectPreview = ({ item, projs }) => {
+  const [loading, setLoading] = useState(false);
   const correctProject = projs.find((proj) => proj.id === item);
   const navigate = useNavigate();
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -15,13 +28,36 @@ export const ProjectPreview = ({ item, projs }) => {
     transform: CSS.Transform.toString(transform),
     transition,
   };
+
+  const downloadPDW = async () => {
+    try {
+      setLoading(true);
+      await fetch(`/api/pdw/download-roadmap/${correctProject?.pdwId}`, {
+        method: "GET",
+      })
+        .then((response) => response.blob())
+        .then((blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `ROADMAP_${correctProject?.pdwId}.xlsx`; // Set the filename
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+        })
+        .catch((error) => console.error("Error:", error));
+    } catch (er) {
+      setError("Something went wrong");
+    }
+    setLoading(false);
+  };
   return (
     <Flex
       style={style}
       ref={setNodeRef}
       {...attributes}
       {...listeners}
-      onClick={() => navigate(`/projects/${correctProject?.id}`)}
       flexDirection="column"
       justifyContent="space-between"
       border="1px solid"
@@ -31,13 +67,39 @@ export const ProjectPreview = ({ item, projs }) => {
       w="100%"
       h="120px"
     >
-      <Heading fontSize="md">{correctProject?.name}</Heading>
-    <Text>{correctProject?.monthsNeeded} months</Text>
+      <Flex justifyContent="space-between">
+        <Box onClick={() => navigate(`/projects/${correctProject?.id}`)}>
+          <Heading fontSize="md">{correctProject?.name}</Heading>
+          <Text>{correctProject?.monthsNeeded} months</Text>
+        </Box>
+        {correctProject?.pdwId && (
+          <ModalWindow
+            type="roadmap"
+            title="Downloading Roadmap"
+            text="Roadmap"
+            onAccept={downloadPDW}
+            acceptText="Accept"
+            modalSize="xl"
+            isLoading={loading}
+          >
+            {loading ? (
+              <Center h={40} flexDir="column" gap={4}>
+                <Text color="#FFA47">Sally is preparing RoadMap...</Text>
+                <Spinner size="xl"/>
+              </Center>
+            ) : (
+              <Center h={40} flexDir="column" gap={4}>
+                <Text>Download Roadmap</Text>
+              </Center>
+            )}
+          </ModalWindow>
+        )}
+      </Flex>
       <Flex w="100%" justifyContent="space-between" gap={2}>
         <AvatarGroup size="xs" max={2}>
           {correctProject?.members &&
             correctProject?.members?.$values.map((user) => (
-              <Avatar name={user?.fullName} bg="red"/>
+              <Avatar name={user?.fullName} bg="red" />
             ))}
         </AvatarGroup>
         <Flex gap={2}>

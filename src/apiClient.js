@@ -1,5 +1,7 @@
 import axios from "axios";
 
+export const baseURL = "https://inventionhack-akfge2hbanfudabb.eastus2-01.azurewebsites.net";
+
 export const apiClient = axios.create({
   baseURL:
     "https://inventionhack-akfge2hbanfudabb.eastus2-01.azurewebsites.net",
@@ -28,9 +30,8 @@ export const apiClientBlob = axios.create({
   baseURL:
     "https://inventionhack-akfge2hbanfudabb.eastus2-01.azurewebsites.net",
   headers: {
-    "Content-Type": "blob",
+    "Content-Type": "application/json",
     Accept: "*/*",
-    "Response-Type": "arraybuffer",
   },
 });
 apiClientBlob.interceptors.request.use(

@@ -85,10 +85,11 @@ export const TableRow = ({ id, items, projs }) => {
       queryClient.setQueryData(["projects"], (oldData) => {
         return {
           ...oldData,
-          $values: [...oldData.$values, data],
+          $values: [...oldData.$values, { ...data, state: 1 }],
         };
       });
     } catch (error) {
+      console.log(error);
       setLoading(false);
       setError("Something went wrong. Please try again later.");
     }
@@ -114,9 +115,9 @@ export const TableRow = ({ id, items, projs }) => {
             isLoading={loading}
           >
             {loading ? (
-              <Center h={40}>
+              <Center h={40} flexDir="column" gap={4}>
                 <Text>Processing...</Text>
-                <Spinner />
+                <Spinner colorScheme="orange" size="xl" />
               </Center>
             ) : (
               <>

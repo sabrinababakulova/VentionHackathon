@@ -21,6 +21,7 @@ export const ModalWindow = ({
   modalSize,
   isLoading,
   disabled,
+  text = 'Client Approve'
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
@@ -41,7 +42,7 @@ export const ModalWindow = ({
         </Flex>
       ) : (
         <Button isDisabled={disabled}  onClick={onOpen} colorScheme="orange" bg="#FF6A47" mr={4} h={8}>
-          Client Approve
+        {text}
         </Button>
       )}
 

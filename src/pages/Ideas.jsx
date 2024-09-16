@@ -22,7 +22,7 @@ import {
 } from "@chakra-ui/react";
 import { ModalWindow } from "../components/Modal";
 import { useParams } from "react-router-dom";
-import { apiClient, apiClientBlob } from "../apiClient";
+import { apiClient, baseURL } from "../apiClient";
 import { useQuery } from "@tanstack/react-query";
 
 const Ideas = () => {
@@ -34,6 +34,10 @@ const Ideas = () => {
   const getProjIdeas = async () => {
     try {
       const { data } = await apiClient.get("/api/idea/byproject/" + id);
+
+      if (data?.$values.find((idea) => idea?.clientApproved)) {
+        setPdw(true);
+      }
       return data;
     } catch (error) {
       setError("Something went wrong. Please try again later.");
@@ -48,26 +52,24 @@ const Ideas = () => {
   const handleClientApprove = async (ideaId) => {
     try {
       setIdeaLoading(true);
-      const data = await apiClientBlob.put(
-        `/api/idea/client-approve/${ideaId}`,
-      );
-
-      // Create a Blob from the binary array (this assumes the backend provides valid XLSX binary data)
-      const blob = new Blob([data?.data], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
-
-      // Create a link element, set the download attribute, and trigger the download
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "file.xlsx"; // Set the filename for the download
-      document.body.appendChild(a);
-      a.click();
-
-      // Clean up the DOM after the download is triggered
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
+      await fetch(`${baseURL}/api/idea/client-approve/${ideaId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => response.blob())
+        .then((blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `PDW_Report_${ideaId}.xlsx`; // Set the filename
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+        })
+        .catch((error) => console.error("Error:", error));
       setPdw(true);
       setIdeaLoading(false);
     } catch (er) {
@@ -76,12 +78,12 @@ const Ideas = () => {
       setError("Something went wrong");
     }
   };
-  const handleTechleadApprove = async (checked) => {
+  const handleTechleadApprove = async (checked, ideaId) => {
     if (!checked) {
       return;
     }
     try {
-      await apiClient.put(`/api/idea/tech-lead-approve/${id}`);
+      await apiClient.put(`/api/idea/tech-lead-approve/${ideaId}`);
     } catch (er) {
       setError("Something went wrong");
     }
@@ -89,7 +91,7 @@ const Ideas = () => {
 
   if (pdw) {
     return (
-      <Center>
+      <Center flexDir="column" gap={4}>
         <Badge p={2} colorScheme="green">
           PDW Downloaded
         </Badge>
@@ -99,8 +101,8 @@ const Ideas = () => {
 
   if (isLoading || !data) {
     return (
-      <Center>
-        <Spinner />
+      <Center h="100vh">
+        <Spinner  size="xl"/>
       </Center>
     );
   }
@@ -153,9 +155,9 @@ const Ideas = () => {
                   isLoading={ideaLoading}
                 >
                   {ideaLoading ? (
-                    <Center h={40}>
+                    <Center h={40} flexDir="column" gap={4}>
                       <Text>Processing...</Text>
-                      <Spinner />
+                      <Spinner size="xl" />
                     </Center>
                   ) : (
                     <VStack gap={3} key="asdfasdf">
@@ -182,9 +184,10 @@ const Ideas = () => {
               ))}
               <Checkbox
                 isReadOnly={localStorage.getItem("role") !== "TechLead"}
-                onChange={(e) => handleTechleadApprove(e.target.checked)}
+                onChange={(e) =>
+                  handleTechleadApprove(e.target.checked, idea?.id)
+                }
                 defaultChecked={idea?.techLeadApproved}
-              
                 colorScheme="orange"
               >
                 Techlead Approval

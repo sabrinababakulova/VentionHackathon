@@ -105,7 +105,6 @@ const Home = () => {
     const { id } = active;
     const { id: overId } = over;
 
-    // Find the containers
     const activeContainer = findContainer(id);
     const overContainer = findContainer(overId);
 
@@ -218,8 +217,8 @@ const Home = () => {
 
   if (isLoading || !data) {
     return (
-      <Center>
-        <Spinner />
+      <Center h="100vh">
+        <Spinner size="xl" />
       </Center>
     );
   }
